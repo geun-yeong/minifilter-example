@@ -11,10 +11,13 @@
 
 
 
-extern PFLT_FILTER flt_handle;
-extern FLT_OPERATION_REGISTRATION operations[];
-extern FLT_REGISTRATION registration;
+extern PFLT_FILTER flt_handle; // in main.c
+extern FLT_OPERATION_REGISTRATION operations[]; // was written in operation.c
+extern FLT_REGISTRATION registration; // was written in registration.c
 
+//
+// were written in operation.c
+//
 FLT_PREOP_CALLBACK_STATUS 
 MinifltExampleCreatePreRoutine(
 	_Inout_ PFLT_CALLBACK_DATA Data,
@@ -30,6 +33,9 @@ MinifltExampleCreatePostRoutine(
 	_In_         FLT_POST_OPERATION_FLAGS Flags
 );
 
+//
+// was written in miniflt.c
+//
 NTSTATUS
 MinifltExampleFilterUnloadRoutine(
 	_In_ FLT_FILTER_UNLOAD_FLAGS flags

@@ -17,29 +17,35 @@
       <UniqueIdentifier>{8E41214B-6785-4CFE-B992-037D68949A14}</UniqueIdentifier>
       <Extensions>inf;inv;inx;mof;mc;</Extensions>
     </Filter>
+    <Filter Include="Source Files\miniflt">
+      <UniqueIdentifier>{8ba7607b-a84e-41c6-b835-f558f25131fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\miniflt">
+      <UniqueIdentifier>{eb8993ea-e4c0-4ce5-b78f-b71297d1b982}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="miniflt.c">
+      <Filter>Source Files\miniflt</Filter>
+    </ClCompile>
     <ClCompile Include="operations.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\miniflt</Filter>
     </ClCompile>
     <ClCompile Include="registration.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\miniflt</Filter>
     </ClCompile>
-    <ClCompile Include="miniflt.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="miniflt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="minifilter.inf">
       <Filter>Driver Files</Filter>
     </Inf>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="miniflt.h">
+      <Filter>Header Files\miniflt</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
