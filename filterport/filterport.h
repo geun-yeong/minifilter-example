@@ -1,13 +1,7 @@
-#ifndef __MINIFLT_EXAMPLE_H__
-#define __MINIFLT_EXAMPLE_H__
+#ifndef __MINIFLTPORT_EXAMPLE_H__
+#define __MINIFLTPORT_EXAMPLE_H__
 
 #include <fltKernel.h>
-
-#define IF_ERROR(func_name, to) \
-			if(!NT_SUCCESS(status)) { \
-				DbgPrint("[miniflt] " __FUNCTION__ " - " #func_name " failed (status: 0x%x)", status); \
-				goto to; \
-			}
 
 
 
@@ -18,14 +12,14 @@ extern FLT_REGISTRATION registration; // was written in registration.c
 //
 // were written in operation.c
 //
-FLT_PREOP_CALLBACK_STATUS 
+FLT_PREOP_CALLBACK_STATUS
 MinifltExampleCreatePreRoutine(
 	_Inout_ PFLT_CALLBACK_DATA Data,
 	_In_    PCFLT_RELATED_OBJECTS FltObjects,
 	_Out_   PVOID* CompletionContext
 );
 
-FLT_POSTOP_CALLBACK_STATUS 
+FLT_POSTOP_CALLBACK_STATUS
 MinifltExampleCreatePostRoutine(
 	_Inout_      PFLT_CALLBACK_DATA Data,
 	_In_         PCFLT_RELATED_OBJECTS FltObjects,
@@ -34,7 +28,7 @@ MinifltExampleCreatePostRoutine(
 );
 
 //
-// was written in miniflt.c
+// was written in filterport.c
 //
 NTSTATUS
 MinifltExampleFilterUnloadRoutine(

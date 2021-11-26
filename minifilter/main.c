@@ -17,14 +17,20 @@ DriverEntry(
 		&registration,
 		&flt_handle
 	);
-	IF_ERROR(FltRegisterFilter, EXIT_OF_DRIVER_ENTRY);
+	IF_ERROR(FltRegisterFilter, CLEANUP_DRIVER_ENTRY);
 
 	status = FltStartFiltering(
 		flt_handle
 	);
-	IF_ERROR(FltStartFiltering, EXIT_OF_DRIVER_ENTRY);
+	IF_ERROR(FltStartFiltering, CLEANUP_DRIVER_ENTRY);
 
-EXIT_OF_DRIVER_ENTRY:
+	return STATUS_SUCCESS;
+
+CLEANUP_DRIVER_ENTRY:
+
+	if (flt_handle) {
+		FltUnregisterFilter(flt_handle);
+	}
 
 	return status;
 }
