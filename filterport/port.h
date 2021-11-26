@@ -35,4 +35,13 @@ MinifltPortMessageRoutine(
 	_Out_ PULONG return_output_buffer_length
 );
 
+NTSTATUS
+MinifltPortSendMessage(
+	_In_ PVOID send_data,
+	_In_ ULONG send_data_size,
+	_Out_opt_ PVOID recv_buffer,
+	_In_ ULONG recv_buffer_size,
+	_Out_ PULONG written_bytes_to_recv_buffer
+);
+
 #endif

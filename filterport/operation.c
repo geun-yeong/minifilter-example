@@ -30,6 +30,7 @@ MinifltExampleCreatePreRoutine(
 	UNREFERENCED_PARAMETER(completion_context);
 
 	PFLT_FILE_NAME_INFORMATION name_info = NULL;
+	FLT_PREOP_CALLBACK_STATUS ret = FLT_PREOP_SUCCESS_WITH_CALLBACK;
 
 	if (flt_object && flt_object->FileObject) {
 		NTSTATUS status;
@@ -44,15 +45,34 @@ MinifltExampleCreatePreRoutine(
 		status = FltParseFileNameInformation(name_info);
 		IF_ERROR(FltParseFileNameInformation, EXIT_OF_CREATE_PRE_OPERATION);
 
+
+
+		FLT_TO_USER sent;        RtlZeroMemory(&sent, sizeof(sent));
+		FLT_TO_USER_REPLY reply; RtlZeroMemory(&reply, sizeof(reply));
+		ULONG returned_bytes = 0;
+
+		// send the file path to client
+		// if client reply to block accessing the file,
+		// the minifilter return STATUS_ACCESS_DENIED to filter manager
+		wcscpy_s(sent.path, ARRAYSIZE(sent.path), name_info->Name.Buffer);
+		status = MinifltPortSendMessage(&sent, sizeof(sent), &reply, sizeof(reply), &returned_bytes);
+		if (NT_SUCCESS(status) && returned_bytes > 0 && reply.block) {
+			callback_data->IoStatus.Status = STATUS_ACCESS_DENIED;
+			ret = FLT_PREOP_COMPLETE;
+		}
+
+
+
 		// get the file name from the full path
 		LPWSTR file_name = wcsrchr(name_info->Name.Buffer, L'\\');
 		if (!file_name) {
-			name_info->Name.Buffer;
+			file_name = name_info->Name.Buffer;
 		}
 
 		DbgPrint(
-			"[filterport] " __FUNCTION__ "  [%u] Start    to creat/open a file (%ws)\n",
+			"[filterport] " __FUNCTION__ " [%u] %s to creat/open a file (%ws)\n",
 			PtrToUint(PsGetCurrentProcessId()),
+			(reply.block) ? "Blocked " : "Complete",
 			file_name
 		);
 	}
@@ -63,7 +83,7 @@ EXIT_OF_CREATE_PRE_OPERATION:
 		FltReleaseFileNameInformation(name_info);
 	}
 
-	return FLT_PREOP_SUCCESS_WITH_CALLBACK;
+	return ret;
 }
 
 
@@ -85,6 +105,7 @@ MinifltExampleCreatePostRoutine(
 	if (flt_object && flt_object->FileObject) {
 		NTSTATUS status;
 
+		// get a file path
 		status = FltGetFileNameInformation(
 			callback_data, 
 			FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT,
@@ -95,10 +116,12 @@ MinifltExampleCreatePostRoutine(
 		status = FltParseFileNameInformation(name_info);
 		IF_ERROR(FltParseFileNameInformation, EXIT_OF_CREATE_POST_OPERATION);
 
+
+
 		// get the file name from the full path
 		LPWSTR file_name = wcsrchr(name_info->Name.Buffer, L'\\');
 		if (!file_name) {
-			name_info->Name.Buffer;
+			file_name = name_info->Name.Buffer;
 		}
 
 		DbgPrint(
