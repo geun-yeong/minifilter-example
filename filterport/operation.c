@@ -71,7 +71,7 @@ MinifltExampleCreatePostRoutine(
 		RtlInitUnicodeString(&file_path, name_info->Name.Buffer);
 		
 		if (!FsRtlIsNameInExpression(&test_txt_pattern, &file_path, TRUE, NULL)) {
-			return FLT_POSTOP_FINISHED_PROCESSING;
+			goto EXIT_OF_CREATE_POST_OPERATION;
 		}
 
 		// get the file name from the full path
