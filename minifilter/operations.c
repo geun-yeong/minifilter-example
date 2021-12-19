@@ -23,16 +23,31 @@ MinifltExampleCreatePreRoutine(
 	_Out_   PVOID* completion_context
 )
 {
-	UNREFERENCED_PARAMETER(data);
+	UNREFERENCED_PARAMETER(flt_object);
 	UNREFERENCED_PARAMETER(completion_context);
 
-	if (flt_object && flt_object->FileObject && flt_object->FileObject->FileName.Buffer) {
-		DbgPrint(
-			"[miniflt] " __FUNCTION__ "  [%u] Start    to creat/open a file (%wZ)\n",
-			PtrToUint(PsGetCurrentProcessId()),
-			&(flt_object->FileObject->FileName)
-		);
+	NTSTATUS status = STATUS_SUCCESS;
+	PFLT_FILE_NAME_INFORMATION name_info = NULL;
+
+	status = FltGetFileNameInformation(data,
+		                               FLT_FILE_NAME_NORMALIZED 
+		                                | FLT_FILE_NAME_QUERY_DEFAULT,
+		                               &name_info);
+	if (!NT_SUCCESS(status)) {
+		return FLT_PREOP_SUCCESS_NO_CALLBACK;
 	}
+
+	status = FltParseFileNameInformation(name_info);
+	if (!NT_SUCCESS(status)) {
+		FltReleaseFileNameInformation(name_info);
+		return FLT_PREOP_SUCCESS_NO_CALLBACK;
+	}
+
+	KdPrint(("[miniflt] " __FUNCTION__ "  [%u] Start    to creat/open a file (%wZ)\n",
+		     PtrToUint(PsGetCurrentProcessId()),
+		     &name_info->FinalComponent));
+
+	FltReleaseFileNameInformation(name_info);
 	
 	return FLT_PREOP_SUCCESS_WITH_CALLBACK;
 }
@@ -47,17 +62,32 @@ MinifltExampleCreatePostRoutine(
 	_In_         FLT_POST_OPERATION_FLAGS flags
 )
 {
-	UNREFERENCED_PARAMETER(data);
+	UNREFERENCED_PARAMETER(flt_object);
 	UNREFERENCED_PARAMETER(completion_context);
 	UNREFERENCED_PARAMETER(flags);
 
-	if (flt_object && flt_object->FileObject && flt_object->FileObject->FileName.Buffer) {
-		DbgPrint(
-			"[miniflt] " __FUNCTION__ " [%u] Complete to creat/open a file (%wZ)\n",
-			PtrToUint(PsGetCurrentProcessId()),
-			&(flt_object->FileObject->FileName)
-		);
+	NTSTATUS status = STATUS_SUCCESS;
+	PFLT_FILE_NAME_INFORMATION name_info = NULL;
+
+	status = FltGetFileNameInformation(data,
+		                               FLT_FILE_NAME_NORMALIZED
+		                                | FLT_FILE_NAME_QUERY_DEFAULT,
+		                               &name_info);
+	if (!NT_SUCCESS(status)) {
+		return FLT_POSTOP_FINISHED_PROCESSING;
 	}
+
+	status = FltParseFileNameInformation(name_info);
+	if (!NT_SUCCESS(status)) {
+		FltReleaseFileNameInformation(name_info);
+		return FLT_POSTOP_FINISHED_PROCESSING;
+	}
+	
+	KdPrint(("[miniflt] " __FUNCTION__ " [%u] Complete to creat/open a file (%wZ)\n",
+		     PtrToUint(PsGetCurrentProcessId()),
+		     &name_info->FinalComponent));
+
+	FltReleaseFileNameInformation(name_info);
 
 	return FLT_POSTOP_FINISHED_PROCESSING;
 }

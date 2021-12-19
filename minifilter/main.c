@@ -12,16 +12,12 @@ DriverEntry(
 
 	NTSTATUS status = STATUS_SUCCESS;
 
-	status = FltRegisterFilter(
-		driver_object,
-		&registration,
-		&flt_handle
-	);
+	status = FltRegisterFilter(driver_object,
+		                       &registration,
+		                       &flt_handle);
 	IF_ERROR(FltRegisterFilter, CLEANUP_DRIVER_ENTRY);
 
-	status = FltStartFiltering(
-		flt_handle
-	);
+	status = FltStartFiltering(flt_handle);
 	IF_ERROR(FltStartFiltering, CLEANUP_DRIVER_ENTRY);
 
 	return STATUS_SUCCESS;
