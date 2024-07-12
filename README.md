@@ -28,4 +28,4 @@ A basic port communcation usage in user-mode application with asynchronous.
 
 # notes
 
-Anybody use this code wherever, whenever, free.
+Anybody can use this code wherever, whenever, free.
